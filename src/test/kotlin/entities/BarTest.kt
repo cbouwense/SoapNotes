@@ -19,17 +19,18 @@ internal class BarTest {
     }
 
     @Test
-    fun `given no Flavor, it should be initialized to UNSCENTED`() {
+    fun `given no flavor, it should be initialized to null`() {
         val bar = Bar()
 
-        assertEquals(Flavor.UNSCENTED, bar.flavor)
+        assertNull(bar.recipe)
     }
 
     @Test
-    fun `given a Flavor, it should be initialized to that Flavor`() {
-        val bar = Bar(flavor = Flavor.COFFEE)
+    fun `given a recipe, it should be initialized to that recipe`() {
+        val recipe = Recipe(name = "coffee")
+        val bar = Bar(recipe = recipe)
 
-        assertEquals(Flavor.COFFEE, bar.flavor)
+        assertEquals(recipe, bar.recipe)
     }
 
     @Test
