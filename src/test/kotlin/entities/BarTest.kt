@@ -27,4 +27,16 @@ internal class BarTest {
         val bar = Bar(flavor = Flavor.COFFEE)
         assertEquals(Flavor.COFFEE, bar.flavor)
     }
+
+    @Test
+    fun `given no isCured, it should be initialized to false`() {
+        val bar = Bar()
+        assertFalse(bar.isCured)
+    }
+
+    @Test
+    fun `given an isCured, it should be initialized to that isCured`() {
+        val bar = Bar(isCured = true)
+        assertTrue(bar.isCured)
+    }
 }
