@@ -15,4 +15,16 @@ internal class BarTest {
         val bar = Bar(id = 42)
         assertEquals(42, bar.id)
     }
+
+    @Test
+    fun `given no Flavor, it should be initialized to UNSCENTED`() {
+        val bar = Bar()
+        assertEquals(Flavor.UNSCENTED, bar.flavor)
+    }
+
+    @Test
+    fun `given a Flavor, it should be initialized to that Flavor`() {
+        val bar = Bar(flavor = Flavor.COFFEE)
+        assertEquals(Flavor.COFFEE, bar.flavor)
+    }
 }
