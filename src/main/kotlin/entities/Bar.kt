@@ -11,7 +11,3 @@ data class Bar(
     val isCured: Boolean = false,
     var owner: Person? = null,
 )
-
-data class Person(
-    val name: String = "Rachel"
-)
