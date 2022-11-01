@@ -56,7 +56,6 @@ internal class BarTest {
     @Test
     fun `given an owner, it should be initialized to that owner`() {
         val scrumpy = Person(name = "Scrumpy")
-        val rachel = Person(name = "Rachel")
         val bar = Bar(owner = scrumpy)
 
         assertEquals(bar.owner, scrumpy)
