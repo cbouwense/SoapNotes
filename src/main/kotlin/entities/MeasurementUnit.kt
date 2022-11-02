@@ -1,5 +1,5 @@
 package entities
 
 enum class MeasurementUnit {
-    GRAMS
+    GRAMS, MILLILITERS
 }

@@ -26,9 +26,27 @@ class IngredientTest {
     }
 
     @Test
+    fun `it should be able to change the measurement amount`() {
+        val ingredient = Ingredient(measurementAmount = 4.2f)
+
+        ingredient.measurementAmount = 13.37f
+
+        assertEquals(13.37f, ingredient.measurementAmount)
+    }
+
+    @Test
     fun `given a measurement unit, it should be initialized to that unit`() {
         val ingredient = Ingredient(measurementUnit = MeasurementUnit.GRAMS)
 
         assertEquals(MeasurementUnit.GRAMS, ingredient.measurementUnit)
+    }
+
+    @Test
+    fun `it should be able to change the measurement unit`() {
+        val ingredient = Ingredient(measurementUnit = MeasurementUnit.GRAMS)
+
+        ingredient.measurementUnit = MeasurementUnit.MILLILITERS
+
+        assertEquals(MeasurementUnit.MILLILITERS, ingredient.measurementUnit)
     }
 }
