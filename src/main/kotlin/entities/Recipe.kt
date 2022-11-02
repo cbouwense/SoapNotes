@@ -1,6 +1,8 @@
 package entities
 
+import java.util.*
+
 data class Recipe(
-    val id: Number = 0,
+    val id: UUID = UUID.randomUUID(),
     var name: String = "",
 )

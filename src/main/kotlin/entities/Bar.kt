@@ -1,8 +1,10 @@
 package entities
 
+import java.util.*
+
 data class Bar(
-    val id: Int = 0,
+    val id: UUID = UUID.randomUUID(),
     val recipe: Recipe? = null,
-    val isCured: Boolean = false,
+    var isCured: Boolean = false,
     var owner: Person? = null,
 )

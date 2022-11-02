@@ -2,20 +2,16 @@ package entities
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.util.*
 
 internal class RecipeTest {
     @Test
-    fun `given no id, it should be initialized to 0`() {
-        val recipe = Recipe()
-
-        assertEquals(0, recipe.id)
-    }
-
-    @Test
     fun `given an id, it should be initialized to that id`() {
-        val recipe = Recipe(id = 42)
+        val uuid = UUID.randomUUID()
+        println(uuid)
+        val recipe = Recipe(id = uuid)
 
-        assertEquals(42, recipe.id)
+        assertEquals(uuid, recipe.id)
     }
 
     @Test

@@ -2,20 +2,15 @@ package entities
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.util.*
 
 internal class BarTest {
     @Test
-    fun `given no id, it should be initialized to 0`() {
-        val bar = Bar()
-
-        assertEquals(0, bar.id)
-    }
-
-    @Test
     fun `given an id, it should be initialized to that id`() {
-        val bar = Bar(id = 42)
+        val uuid = UUID.randomUUID()
+        val bar = Bar(id = uuid)
 
-        assertEquals(42, bar.id)
+        assertEquals(uuid, bar.id)
     }
 
     @Test
@@ -43,6 +38,15 @@ internal class BarTest {
     @Test
     fun `given an isCured, it should be initialized to that isCured`() {
         val bar = Bar(isCured = true)
+
+        assertTrue(bar.isCured)
+    }
+
+    @Test
+    fun `it should be able to change isCured`() {
+        val bar = Bar()
+
+        bar.isCured = true
 
         assertTrue(bar.isCured)
     }
