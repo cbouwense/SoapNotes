@@ -29,4 +29,20 @@ internal class RecipeTest {
 
         assertEquals("lemon poppyseed", recipe.name)
     }
+
+    @Test
+    fun `given a version, it should be initialized to that version`() {
+        val recipe = Recipe(version = "v1.0.0")
+
+        assertEquals("v1.0.0", recipe.version)
+    }
+
+    @Test
+    fun `should be able to change the version`() {
+        val recipe = Recipe(version = "v1.0.0")
+
+        recipe.version = "v1.0.1"
+
+        assertEquals("v1.0.1", recipe.version)
+    }
 }
