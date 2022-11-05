@@ -2,9 +2,14 @@ package entities
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import java.lang.RuntimeException
 import java.util.*
 
 internal class RecipeTest {
+    val oliveOil = Ingredient(name = "Olive oil")
+    val coconutOil = Ingredient(name = "Coconut oil")
+
     @Test
     fun `given an id, it should be initialized to that id`() {
         val uuid = UUID.randomUUID()
@@ -44,5 +49,51 @@ internal class RecipeTest {
         recipe.version = "v1.0.1"
 
         assertEquals("v1.0.1", recipe.version)
+    }
+
+    @Test
+    fun `it should default its ingredients to an empty array`() {
+        val recipe = Recipe()
+
+        assertEquals(0, recipe.ingredients.size)
+    }
+
+    @Test
+    fun `it should be able to add ingredients in its constructor`() {
+        val recipe = Recipe(ingredients = arrayListOf(oliveOil, coconutOil))
+
+        assertTrue(recipe.ingredients.contains(oliveOil))
+        assertTrue(recipe.ingredients.contains(coconutOil))
+    }
+
+    @Test
+    fun `it should be able to add ingredients`() {
+        val recipe = Recipe()
+
+        recipe.addIngredient(oliveOil)
+        recipe.addIngredient(coconutOil)
+
+        assertTrue(recipe.ingredients.contains(oliveOil))
+        assertTrue(recipe.ingredients.contains(coconutOil))
+    }
+
+    @Test
+    fun `it should be able to remove ingredients`() {
+        val recipe = Recipe(ingredients = arrayListOf(oliveOil, coconutOil))
+
+        recipe.removeIngredient(oliveOil)
+
+        assertFalse(recipe.ingredients.contains(oliveOil))
+        assertTrue(recipe.ingredients.contains(coconutOil))
+    }
+
+    @Test
+    fun `when you try to remove an ingredient that is not in the recipe, it should not change the list of ingredients`() {
+        val ingredients = arrayListOf<Ingredient>(oliveOil)
+        val recipe = Recipe(ingredients = ingredients)
+
+        recipe.removeIngredient(coconutOil)
+
+        assertEquals(ingredients, recipe.ingredients)
     }
 }
