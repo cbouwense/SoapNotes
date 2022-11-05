@@ -1,7 +1,9 @@
 package entities
 
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class ProductTest {
     @Test
@@ -68,4 +70,37 @@ class ProductTest {
 
         assertEquals(1337, product.priceInCents)
     }
+
+    @Nested
+    inner class GetPricePerGram {
+        @Test
+        fun `when the product measurement unit is grams, it should return the price in cents divided by the measurement amount`() {
+            val product = Product(
+                priceInCents = 42,
+                netWeightUnit = MeasurementUnit.GRAMS,
+                netWeightAmount = 1.0f,
+            )
+
+            assertEquals(42, product.getCentsPerGram())
+        }
+
+        @Test
+        fun `when the product measurement amount is 0, it should throw an ArithmeticException`() {
+            val product = Product(priceInCents = 42)
+
+            assertThrows<ArithmeticException>{ product.getCentsPerGram() }
+        }
+
+        @Test
+        fun `when the product measurement unit is not grams, it should convert to grams and return the price in cents divided by the measurement amount`() {
+            val product = Product(
+                priceInCents = 1337,
+                netWeightUnit = MeasurementUnit.OUNCES,
+                netWeightAmount = 4.2f,
+            )
+
+            assertEquals(11, product.getCentsPerGram())
+        }
+    }
+
 }
