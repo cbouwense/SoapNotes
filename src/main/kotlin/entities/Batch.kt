@@ -10,7 +10,7 @@ class Batch (
     val flavor: String = "",
 ) {
     override fun toString(): String {
-        if (recipe == null) return "Batch #${number}"
+        if (recipe == null) return "Batch #${number}: ${flavor}"
         return "Batch #${number}: ${flavor} (${recipe.name} ${recipe.version})"
     }
 }
