@@ -29,29 +29,6 @@ internal class BarTest {
     }
 
     @Test
-    fun `given no isCured, it should be initialized to false`() {
-        val bar = Bar()
-
-        assertFalse(bar.isCured)
-    }
-
-    @Test
-    fun `given an isCured, it should be initialized to that isCured`() {
-        val bar = Bar(isCured = true)
-
-        assertTrue(bar.isCured)
-    }
-
-    @Test
-    fun `it should be able to change isCured`() {
-        val bar = Bar()
-
-        bar.isCured = true
-
-        assertTrue(bar.isCured)
-    }
-
-    @Test
     fun `given no owner, it should be initialized to null`() {
         val bar = Bar()
 

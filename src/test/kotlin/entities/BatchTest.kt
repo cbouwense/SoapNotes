@@ -3,6 +3,7 @@ package entities
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 internal class BatchTest {
     @Test
@@ -41,9 +42,48 @@ internal class BatchTest {
         assertEquals(recipe, batch.recipe)
     }
 
+    @Test
+    fun `it should default pour date to today`() {
+        val batch = Batch()
+
+        assertEquals(LocalDate.now(), batch.pourDate)
+    }
+
+    @Test
+    fun `it should default cure date to six weeks after the pour date`() {
+        val batch = Batch()
+
+        assertEquals(LocalDate.now().plusWeeks(6), batch.cureDate)
+    }
+
+    @Nested
+    class isCured {
+        @Test
+        fun `when the cure date is tomorrow, it should return false`() {
+            val batch = Batch(cureDate = LocalDate.now().plusDays(1))
+
+            assertFalse(batch.isCured())
+        }
+
+        @Test
+        fun `when the cure date is today, it should return true`() {
+            val batch = Batch(cureDate = LocalDate.now())
+
+            assertTrue(batch.isCured())
+        }
+
+        @Test
+        fun `when the cure date is yesterday, it should return true`() {
+            val batch = Batch(cureDate = LocalDate.now().minusDays(1))
+
+            assertTrue(batch.isCured())
+        }
+    }
+
     @Nested
     class ToString {
-        @Test fun `when the recipe is null, it just returns the batch number and recipe`() {
+        @Test
+        fun `when the recipe is null, it just returns the batch number and recipe`() {
             val batch = Batch(number = 1738, flavor = "Lavender")
 
             assertEquals("Batch #1738: Lavender", batch.toString())
