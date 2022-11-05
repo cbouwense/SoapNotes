@@ -57,7 +57,7 @@ internal class BatchTest {
     }
 
     @Nested
-    class isCured {
+    inner class IsCured {
         @Test
         fun `when the cure date is tomorrow, it should return false`() {
             val batch = Batch(cureDate = LocalDate.now().plusDays(1))
@@ -81,7 +81,7 @@ internal class BatchTest {
     }
 
     @Nested
-    class ToString {
+    inner class ToString {
         @Test
         fun `when the recipe is null, it just returns the batch number and recipe`() {
             val batch = Batch(number = 1738, flavor = "Lavender")

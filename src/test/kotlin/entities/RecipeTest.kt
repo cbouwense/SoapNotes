@@ -2,13 +2,11 @@ package entities
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import java.lang.RuntimeException
 import java.util.*
 
 internal class RecipeTest {
-    val oliveOil = Ingredient(name = "Olive oil")
-    val coconutOil = Ingredient(name = "Coconut oil")
+    private val oliveOil = Ingredient(name = "Olive oil")
+    private val coconutOil = Ingredient(name = "Coconut oil")
 
     @Test
     fun `given an id, it should be initialized to that id`() {
@@ -89,7 +87,7 @@ internal class RecipeTest {
 
     @Test
     fun `when you try to remove an ingredient that is not in the recipe, it should not change the list of ingredients`() {
-        val ingredients = arrayListOf<Ingredient>(oliveOil)
+        val ingredients = arrayListOf(oliveOil)
         val recipe = Recipe(ingredients = ingredients)
 
         recipe.removeIngredient(coconutOil)
