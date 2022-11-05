@@ -12,13 +12,6 @@ class IngredientTest {
     }
 
     @Test
-    fun `given a price, it should be initialized to that price`() {
-        val ingredient = Ingredient(priceInCents = 1337)
-
-        assertEquals(1337, ingredient.priceInCents)
-    }
-
-    @Test
     fun `given a measurement amount, it should be initialized to that amount`() {
         val ingredient = Ingredient(measurementAmount = 4.2f)
 
