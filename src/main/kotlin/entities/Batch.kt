@@ -11,6 +11,6 @@ class Batch (
 ) {
     override fun toString(): String {
         if (recipe == null) return "Batch #${number}"
-        return "Batch #${number}: ${recipe.name} ${recipe.version}"
+        return "Batch #${number}: ${flavor} (${recipe.name} ${recipe.version})"
     }
 }

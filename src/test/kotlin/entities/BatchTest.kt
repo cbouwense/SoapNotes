@@ -20,6 +20,20 @@ internal class BatchTest {
     }
 
     @Test
+    fun `it defaults the flavor to null`() {
+        val batch = Batch()
+
+        assertEquals("", batch.flavor)
+    }
+
+    @Test
+    fun `given a flavor, it should initialize its to what is given`() {
+        val batch = Batch(flavor = "Coffee")
+
+        assertEquals("Coffee", batch.flavor)
+    }
+
+    @Test
     fun `given a recipe, it should initialize its to what is given`() {
         val recipe = Recipe()
         val batch = Batch(recipe = recipe)
@@ -29,10 +43,10 @@ internal class BatchTest {
 
     @Nested
     class ToString {
-        @Test fun `when the batch recipe is null, it just returns the batch number in the string`() {
-            val batch = Batch(number = 1738)
+        @Test fun `when the recipe is null, it just returns the batch number and recipe`() {
+            val batch = Batch(number = 1738, flavor = "Lavender")
 
-            assertEquals("Batch #1738", batch.toString())
+            assertEquals("Batch #1738: Lavender", batch.toString())
         }
 
         @Test
@@ -44,9 +58,10 @@ internal class BatchTest {
             val batch = Batch(
                 number = 42,
                 recipe = recipe,
+                flavor = "Coffee"
             )
 
-            assertEquals("Batch #42: Muppy Bar v2.0.2", batch.toString())
+            assertEquals("Batch #42: Coffee (Muppy Bar v2.0.2)", batch.toString())
         }
     }
 }
