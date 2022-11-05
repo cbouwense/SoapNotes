@@ -10,10 +10,10 @@ class Batch (
     val recipe: Recipe? = null,
 ) {
     fun calculateCost(): Int {
-//        return recipe.ingredients.reduce {
-//            acc: Ingredient, i: Ingredient -> acc += i.getCost()
-//        }
-        return 0
+        if (recipe == null) return 0
+        return recipe.ingredients.fold(initial = 0) {
+            acc, i -> acc + i.getCost()
+        }
     }
 
     fun isCured(): Boolean {

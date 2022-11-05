@@ -110,6 +110,43 @@ internal class BatchTest {
 
     @Nested
     inner class calculateCost {
+        // $1 per gram.
+        private val rednersOliveOil = Product(
+            netWeightAmount = 100.0f,
+            netWeightUnit = GRAMS,
+            priceInCents = 10000,
+        )
+        // $9 per gram.
+        private val rednersAvocadoOil = Product(
+            netWeightAmount = 100.0f,
+            netWeightUnit = GRAMS,
+            priceInCents = 90000,
+        )
+        // 10 grams of olive oil at $1/g = $10
+        private val oliveOil = Ingredient(
+            product = rednersOliveOil,
+            measurementAmount = 10.0f,
+            measurementUnit = GRAMS,
+        )
+        // 10 grams of olive oil at $10/g = $45
+        private val avocadoOil = Ingredient(
+            product = rednersAvocadoOil,
+            measurementAmount = 50.0f,
+            measurementUnit = GRAMS,
+        )
+        // 1.410958 oz of olive oil at $1/g = $40
+        private val oliveOilInOunces = Ingredient(
+            product = rednersOliveOil,
+            measurementAmount = 1.410958f,
+            measurementUnit = OUNCES,
+        )
+        // 6.667 mL of olive oil at $9/g = $60
+        private val avocadoOilInMilliliters = Ingredient(
+            product = rednersAvocadoOil,
+            measurementAmount = 6.667f,
+            measurementUnit = MILLILITERS,
+        )
+
         @Test
         fun `when there are no ingredients in the batch, it should return 0`() {
             val batch = Batch(recipe = Recipe())
@@ -117,24 +154,28 @@ internal class BatchTest {
             assertEquals(0, batch.calculateCost())
         }
 
-//        @Test
-//        fun `when the ingredients' costs sum up to $100, it should return 10000`() {
-//            // $1 per gram.
-//            val rednersOliveOil = Product(
-//                netWeightAmount = 100.0f,
-//                netWeightUnit = GRAMS,
-//                priceInCents = 10000,
-//            )
-//            // 10 grams of olive oil at $1/g = $10
-//            val oliveOil = Ingredient(
-//                product = rednersOliveOil,
-//                measurementAmount = 10.0f,
-//                measurementUnit = GRAMS,
-//            )
-//            val recipe = Recipe(ingredients = arrayListOf(oliveOil))
-//            val batch = Batch(recipe = recipe)
-//
-//            assertEquals(10000, batch.calculateCost())
-//        }
+        @Test
+        fun `given one ingredient, when the ingredient's cost per gram is $1 and the recipe calls for 10 grams, it should return 1000`() {
+            val recipe = Recipe(ingredients = arrayListOf(oliveOil))
+            val batch = Batch(recipe = recipe)
+
+            assertEquals(1000, batch.calculateCost())
+        }
+
+        @Test
+        fun `given both ingredients use grams, when the first ingredient costs $10 and the second ingredient costs $450, it should return 46000`() {
+            val recipe = Recipe(ingredients = arrayListOf(oliveOil, avocadoOil))
+            val batch = Batch(recipe = recipe)
+
+            assertEquals(46000, batch.calculateCost())
+        }
+
+        @Test
+        fun `given one ingredient uses ounces and the other uses milliliters, when their sum is $100, it should return 10000`() {
+            val recipe = Recipe(ingredients = arrayListOf(oliveOilInOunces, avocadoOilInMilliliters))
+            val batch = Batch(recipe = recipe)
+
+            assertEquals(10000, batch.calculateCost())
+        }
     }
 }
