@@ -1,5 +1,6 @@
 package entities
 
+import entities.MeasurementUnit.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -105,5 +106,35 @@ internal class BatchTest {
 
             assertEquals("Batch #42: Coffee (Muppy Bar v2.0.2)", batch.toString())
         }
+    }
+
+    @Nested
+    inner class calculateCost {
+        @Test
+        fun `when there are no ingredients in the batch, it should return 0`() {
+            val batch = Batch(recipe = Recipe())
+
+            assertEquals(0, batch.calculateCost())
+        }
+
+//        @Test
+//        fun `when the ingredients' costs sum up to $100, it should return 10000`() {
+//            // $1 per gram.
+//            val rednersOliveOil = Product(
+//                netWeightAmount = 100.0f,
+//                netWeightUnit = GRAMS,
+//                priceInCents = 10000,
+//            )
+//            // 10 grams of olive oil at $1/g = $10
+//            val oliveOil = Ingredient(
+//                product = rednersOliveOil,
+//                measurementAmount = 10.0f,
+//                measurementUnit = GRAMS,
+//            )
+//            val recipe = Recipe(ingredients = arrayListOf(oliveOil))
+//            val batch = Batch(recipe = recipe)
+//
+//            assertEquals(10000, batch.calculateCost())
+//        }
     }
 }

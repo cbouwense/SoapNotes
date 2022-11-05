@@ -9,7 +9,13 @@ class Batch (
     val cureDate: LocalDate =  LocalDate.now().plusWeeks(6),
     val recipe: Recipe? = null,
 ) {
-    @Suppress("BooleanMethodIsAlwaysInverted")
+    fun calculateCost(): Int {
+//        return recipe.ingredients.reduce {
+//            acc: Ingredient, i: Ingredient -> acc += i.getCost()
+//        }
+        return 0
+    }
+
     fun isCured(): Boolean {
         return cureDate.isEqual(LocalDate.now()) || cureDate.isBefore(LocalDate.now())
     }
