@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import java.util.*
 
 internal class BarTest {
-
     @Test
     fun `given an id, it should be initialized to that id`() {
         val uuid = UUID.randomUUID()
@@ -15,11 +14,18 @@ internal class BarTest {
     }
 
     @Test
-    fun `given a recipe, it should be initialized to that recipe`() {
-        val recipe = Recipe(name = "coffee")
-        val bar = Bar(recipe = recipe)
+    fun `it defaults its batch to null`() {
+        val bar = Bar()
 
-        assertEquals(recipe, bar.recipe)
+        assertNull(bar.batch)
+    }
+
+    @Test
+    fun `given a batch, it should be initialized to that recipe`() {
+        val batch = Batch()
+        val bar = Bar(batch = batch)
+
+        assertEquals(batch, bar.batch)
     }
 
     @Test
