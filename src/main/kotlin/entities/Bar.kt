@@ -4,7 +4,7 @@ import java.util.*
 
 data class Bar(
     val id: UUID = UUID.randomUUID(),
-    val recipe: Recipe? = null,
+    val recipe: Recipe,
     var isCured: Boolean = false,
     var owner: Person? = null,
 )
