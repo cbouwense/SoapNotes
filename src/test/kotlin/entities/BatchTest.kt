@@ -59,6 +59,66 @@ internal class BatchTest {
         assertEquals(LocalDate.now().plusWeeks(6), batch.cureDate)
     }
 
+    @Test
+    fun `when there are no bars in the batch, it should return 0`() {
+        val batch = Batch()
+
+        assertEquals(0, batch.bars.size)
+    }
+
+    @Test
+    fun `when there is 1 bar in the batch, it should return 1`() {
+        val batch = Batch(bars = arrayListOf(Bar()))
+
+        assertEquals(1, batch.bars.size)
+    }
+
+    @Test
+    fun `when there are 3 bars in the batch, it should return 3`() {
+        val batch = Batch(bars = arrayListOf(Bar(), Bar(), Bar()))
+
+        assertEquals(3, batch.bars.size)
+    }
+
+    @Nested
+    inner class CutIntoBars {
+        @Test
+        fun `given 0 bars to cut, it should not increase the number of bars in the batch`() {
+            val batch = Batch()
+
+            batch.cutIntoBars(0)
+
+            assertEquals(0, batch.bars.size)
+        }
+
+        @Test
+        fun `given 1 bar to cut, it should increase the number of bars to 1`() {
+            val batch = Batch()
+
+            batch.cutIntoBars(1)
+
+            assertEquals(1, batch.bars.size)
+        }
+
+        @Test
+        fun `given 1 bar to cut, it should add a bar with the recipe to its list`() {
+            val batch1 = Batch(number = 1)
+
+            batch1.cutIntoBars(1)
+
+            assertEquals(batch1, batch1.bars.first().batch)
+        }
+
+        @Test
+        fun `given 12 bars to cut, it should increase the number of bars to 12`() {
+            val batch = Batch(number = 42)
+
+            batch.cutIntoBars(12)
+
+            assertTrue(batch.bars.all { it.batch == batch })
+        }
+    }
+
     @Nested
     inner class IsCured {
         @Test
@@ -109,7 +169,7 @@ internal class BatchTest {
     }
 
     @Nested
-    inner class calculateCost {
+    inner class CalculateCost {
         // $1 per gram.
         private val rednersOliveOil = Product(
             netWeightAmount = 100.0f,
@@ -146,6 +206,13 @@ internal class BatchTest {
             measurementAmount = 6.667f,
             measurementUnit = MILLILITERS,
         )
+
+        @Test
+        fun `when the batch has no recipe, it should return 0`() {
+            val batch = Batch()
+
+            assertEquals(0, batch.calculateCost())
+        }
 
         @Test
         fun `when there are no ingredients in the batch, it should return 0`() {
