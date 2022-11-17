@@ -1,24 +1,27 @@
 package db
 
 import entities.Recipe
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito
+import java.sql.DriverManager
 
-// TODO: this should probably be fetching from a spy database
 internal class SQLiteTest {
-    @Test
-    fun `it can fetch a recipe by id`() {
-        val sqlite = SQLite()
-        val recipe = sqlite.getById(table = "recipes", id = 1337)
+    private val defaultDBName = "soapnotes"
+    private val c = DriverManager.getConnection("jdbc:sqlite:${defaultDBName}.db")
+    private val statementSpy = Mockito.spy(c.createStatement())
 
-        assertEquals(1337, recipe.id)
-        assertEquals("leet", recipe.name)
-        assertEquals("13.37", recipe.version)
+    @Test
+    fun `create sends the right query to the database`() {
+        val sqlite = SQLite(s = statementSpy)
+        val recipe = Recipe(id = 42, name = "the answer", version = "4.2")
+
+        sqlite.create(table = "recipes", recipe = recipe)
+
+        Mockito.verify(statementSpy).executeUpdate("INSERT INTO recipes VALUES(42, 'the answer', '4.2')")
     }
 
-    @Test
     fun `it can create a recipe`() {
-        val sqlite = SQLite()
+        val sqlite = SQLite(s = statementSpy)
         val recipe = Recipe(id = 42, name = "the answer", version = "4.2")
 
         sqlite.create(table = "recipes", recipe = recipe)
