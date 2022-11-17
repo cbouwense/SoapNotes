@@ -10,11 +10,10 @@ internal class RecipeTest {
 
     @Test
     fun `given an id, it should be initialized to that id`() {
-        val uuid = UUID.randomUUID()
-        println(uuid)
-        val recipe = Recipe(id = uuid)
+        val id = 42
+        val recipe = Recipe(id = id)
 
-        assertEquals(uuid, recipe.id)
+        assertEquals(id, recipe.id)
     }
 
     @Test

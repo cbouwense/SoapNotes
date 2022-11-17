@@ -3,7 +3,7 @@ package entities
 import java.util.*
 
 class Recipe(
-    val id: UUID = UUID.randomUUID(),
+    val id: Int = 0,
     val ingredients: ArrayList<Ingredient> = arrayListOf(),
     var name: String = "",
     var version: String = "",

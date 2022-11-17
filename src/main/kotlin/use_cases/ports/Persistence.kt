@@ -1,9 +1,8 @@
 package use_cases.ports
 
 import entities.Recipe
-import java.util.UUID
 
 interface Persistence {
-    fun getById(id: UUID)
-    fun save(recipe: Recipe)
+    fun create(table: String, values: List<String>)
+    fun getById(table: String, id: Int): Recipe
 }
