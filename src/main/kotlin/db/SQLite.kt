@@ -8,8 +8,8 @@ import java.sql.Statement
 
 // Specific to Recipes, just to start out.
 class SQLite : Persistence {
-    override fun create(table: String, values: List<String>) {
-        update("INSERT INTO ${table} VALUES(${values})")
+    override fun create(table: String, recipe: Recipe) {
+        update("INSERT INTO ${table} VALUES(${recipe.id}, '${recipe.name}', '${recipe.version}')")
     }
 
     override fun getById(table: String, id: Int): Recipe {
