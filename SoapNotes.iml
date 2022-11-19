@@ -15,5 +15,6 @@
     <orderEntry type="library" name="mockito.core" level="project" />
     <orderEntry type="library" name="jooq" level="project" />
     <orderEntry type="library" name="xerial.sqlite.jdbc" level="project" />
+    <orderEntry type="library" name="assertj.core" level="project" />
   </component>
 </module>

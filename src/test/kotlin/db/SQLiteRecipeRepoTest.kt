@@ -1,9 +1,10 @@
 package db
 
 import entities.Recipe
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito
@@ -24,64 +25,115 @@ internal class SQLiteRecipeRepoTest {
     val sqlite = SQLiteRecipeRepo(s = statementSpy)
 
     @BeforeEach
-    fun initializeMocks() {
+    fun beforeEach() {
         Mockito.`when`(resultSetFake.getInt("id")).thenReturn(id)
         Mockito.`when`(resultSetFake.getString("name")).thenReturn(name)
         Mockito.`when`(resultSetFake.getString("version")).thenReturn(version)
         Mockito.`when`(statementSpy.executeQuery(anyString())).thenReturn(resultSetFake)
-        Mockito.`when`(statementSpy.executeUpdate(anyString())).thenReturn(1)
     }
 
-    @Test
-    fun `sends the correct create update to sqlite`() {
-        sqlite.create(recipe = recipe)
+    @Nested
+    inner class Create {
+        @BeforeEach
+        fun beforeEach() {
+            Mockito.`when`(statementSpy.executeUpdate(anyString())).thenReturn(1)
+        }
 
-        Mockito.verify(statementSpy, times(1)).executeUpdate("INSERT INTO recipes VALUES($id, '$name', '$version')")
+        @Test
+        fun `sends the correct create update to sqlite`() {
+            sqlite.create(recipe = recipe)
+
+            Mockito.verify(statementSpy, times(1)).executeUpdate("INSERT INTO recipes VALUES($id, '$name', '$version')")
+        }
+
+        @Test
+        fun `when the creation is a success, returns the result from the update`() {
+            assertEquals(1, sqlite.create(recipe = recipe))
+        }
+
+        @Test
+        fun `when the creation is a failure, returns a non-zero code`() {
+            Mockito.`when`(statementSpy.executeUpdate(anyString())).thenThrow(SQLException::class.java)
+
+            assertEquals(-1, sqlite.create(recipe = recipe))
+        }
     }
 
-    @Test
-    fun `when the creation is a success, returns the result from the update`() {
-        assertEquals(1, sqlite.create(recipe = recipe))
+    @Nested
+    inner class FindById {
+        @Test
+        fun `sends the correct query to find recipe by id`() {
+            sqlite.findById(id = id)
+
+            Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes WHERE id LIKE $id")
+        }
+
+        @Test
+        fun `when there is a corresponding recipe in the db, returns the Recipe`() {
+            val result = sqlite.findById(id = id)
+
+            assertThat(result).usingRecursiveComparison().isEqualTo(recipe)
+        }
     }
 
-    @Test
-    fun `when the creation is a failure, returns a non-zero code`() {
-        Mockito.`when`(statementSpy.executeUpdate(anyString())).thenThrow(SQLException::class.java)
+    @Nested
+    inner class FindByNameAndVersion {
+        @Test
+        fun `send the correct query to find recipe by name and version`() {
+            sqlite.findByNameAndVersion(name = name, version = version)
 
-        assertEquals(-1, sqlite.create(recipe = recipe))
+            Mockito.verify(statementSpy, times(1))
+                .executeQuery("SELECT * FROM recipes WHERE name LIKE $name AND version LIKE $version")
+        }
+
+        @Test
+        fun `when there is a recipe with the given name and version in the db, returns the Recipe`() {
+            val result = sqlite.findByNameAndVersion(name = name, version = version)
+
+            assertThat(result).usingRecursiveComparison().isEqualTo(recipe)
+        }
     }
 
-    @Test
-    fun `sends the correct query to find recipe by id`() {
-        sqlite.findById(id = id)
+    @Nested
+    inner class GetAll {
+        val recipe1 = Recipe(id = id, name = "${name}0", version = "${version}.0")
+        val recipe2 = Recipe(id = id + 1, name = "${name}1", version = "${version}.1")
+        val recipe3 = Recipe(id = id + 2, name = "${name}2", version = "${version}.2")
 
-        Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes WHERE id LIKE $id")
-    }
+        @BeforeEach
+        fun beforeEach() {
+            Mockito.`when`(resultSetFake.getInt("id"))
+                .thenReturn(recipe1.id)
+                .thenReturn(recipe2.id)
+                .thenReturn(recipe3.id)
+            Mockito.`when`(resultSetFake.getString("name"))
+                .thenReturn(recipe1.name)
+                .thenReturn(recipe2.name)
+                .thenReturn(recipe3.name)
+            Mockito.`when`(resultSetFake.getString("version"))
+                .thenReturn(recipe1.version)
+                .thenReturn(recipe2.version)
+                .thenReturn(recipe3.version)
+            Mockito.`when`(resultSetFake.next())
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(false)
+            Mockito.`when`(statementSpy.executeQuery(anyString())).thenReturn(resultSetFake)
+        }
 
-    @Test
-    fun `when there is a corresponding recipe in the db, returns the Recipe`() {
-        val result = sqlite.findById(id = id)
+        @Test
+        fun `sends the correct query to get all recipes`() {
+            sqlite.getAll()
 
-        // TODO: figure out how to do deep equality in tests.
-        assertEquals(recipe.id, result.id)
-        assertEquals(recipe.name, result.name)
-        assertEquals(recipe.version, result.version)
-    }
+            Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes")
+        }
 
-    @Test
-    fun `send the correct query to find recipe by name and version`() {
-        sqlite.findByNameAndVersion(name = name, version = version)
+        @Test
+        fun `when there are recipe in the db, returns a list of Recipes`() {
+            val result = sqlite.getAll()
 
-        Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes WHERE name LIKE $name AND version LIKE $version")
-    }
-
-    @Test
-    fun `when there is a recipe with the given name and version in the db, returns the Recipe`() {
-        val result = sqlite.findByNameAndVersion(name = name, version = version)
-
-        // TODO: figure out how to do deep equality in tests.
-        assertEquals(recipe.id, result?.id)
-        assertEquals(recipe.name, result?.name)
-        assertEquals(recipe.version, result?.version)
+            assertThat(result).usingRecursiveComparison().isEqualTo(listOf(recipe1, recipe2, recipe3))
+        }
     }
 }

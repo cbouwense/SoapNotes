@@ -32,6 +32,24 @@ class SQLiteRecipeRepo(val s: Statement) : RecipeRepo {
         )
     }
 
+    override fun getAll(): List<Recipe> {
+        val result = query("SELECT * FROM recipes")
+
+        val listOfRecipes = ArrayList<Recipe>()
+
+        while (result.next()) {
+            listOfRecipes.add(
+                Recipe(
+                    id = result.getInt("id"),
+                    name = result.getString("name"),
+                    version = result.getString("version")
+                )
+            )
+        }
+
+        return listOfRecipes.toList()
+    }
+
     // TODO: this should probably be in a parent class.
     private fun update(sql: String): Int {
         try {
