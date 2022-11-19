@@ -16,14 +16,18 @@ import java.sql.Statement
 internal class SQLiteRecipeRepoTest {
     val resultSetFake = Mockito.mock(ResultSet::class.java)
     val statementSpy = Mockito.mock(Statement::class.java)
-    val recipe = Recipe(id = 42, name = "the answer", version = "4.2")
+
+    val id = 42
+    val name = "the answer"
+    val version = "4.2"
+    val recipe = Recipe(id = id, name = name, version = version)
     val sqlite = SQLiteRecipeRepo(s = statementSpy)
 
     @BeforeAll
     fun initializeMocks() {
-        Mockito.`when`(resultSetFake.getInt("id")).thenReturn(42)
-        Mockito.`when`(resultSetFake.getString("name")).thenReturn("the answer")
-        Mockito.`when`(resultSetFake.getString("version")).thenReturn("4.2")
+        Mockito.`when`(resultSetFake.getInt("id")).thenReturn(id)
+        Mockito.`when`(resultSetFake.getString("name")).thenReturn(name)
+        Mockito.`when`(resultSetFake.getString("version")).thenReturn(version)
         Mockito.`when`(statementSpy.executeQuery(anyString())).thenReturn(resultSetFake)
     }
 
@@ -31,13 +35,20 @@ internal class SQLiteRecipeRepoTest {
     fun `sends the correct create update to sqlite`() {
         sqlite.create(recipe = recipe)
 
-        Mockito.verify(statementSpy).executeUpdate("INSERT INTO recipes VALUES(42, 'the answer', '4.2')")
+        Mockito.verify(statementSpy, times(1)).executeUpdate("INSERT INTO recipes VALUES($id, '$name', '$version')")
     }
 
     @Test
     fun `sends the correct query to find recipe by id`() {
-        sqlite.findById(id = 42)
+        sqlite.findById(id = id)
 
-        Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes WHERE id LIKE 42")
+        Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes WHERE id LIKE $id")
+    }
+
+    @Test
+    fun `send the correct query to find recipe by name and version`() {
+        sqlite.findByNameAndVersion(name = name, version = version)
+
+        Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes WHERE name LIKE $name AND version LIKE $version")
     }
 }
