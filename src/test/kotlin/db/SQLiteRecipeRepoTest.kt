@@ -2,18 +2,17 @@ package db
 
 import entities.Recipe
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito
 import org.mockito.Mockito.anyString
 import org.mockito.Mockito.times
-import java.sql.DriverManager
 import java.sql.ResultSet
+import java.sql.SQLException
 import java.sql.Statement
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class SQLiteRecipeRepoTest {
     val resultSetFake = Mockito.mock(ResultSet::class.java)
     val statementSpy = Mockito.mock(Statement::class.java)
@@ -30,6 +29,7 @@ internal class SQLiteRecipeRepoTest {
         Mockito.`when`(resultSetFake.getString("name")).thenReturn(name)
         Mockito.`when`(resultSetFake.getString("version")).thenReturn(version)
         Mockito.`when`(statementSpy.executeQuery(anyString())).thenReturn(resultSetFake)
+        Mockito.`when`(statementSpy.executeUpdate(anyString())).thenReturn(1)
     }
 
     @Test
@@ -40,8 +40,15 @@ internal class SQLiteRecipeRepoTest {
     }
 
     @Test
-    fun `when the creation is a success, returns 0`() {
-        assertEquals(0, sqlite.create(recipe = recipe))
+    fun `when the creation is a success, returns the result from the update`() {
+        assertEquals(1, sqlite.create(recipe = recipe))
+    }
+
+    @Test
+    fun `when the creation is a failure, returns a non-zero code`() {
+        Mockito.`when`(statementSpy.executeUpdate(anyString())).thenThrow(SQLException::class.java)
+
+        assertEquals(-1, sqlite.create(recipe = recipe))
     }
 
     @Test

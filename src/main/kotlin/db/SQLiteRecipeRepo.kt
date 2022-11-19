@@ -4,6 +4,7 @@ import entities.Recipe
 import ports.RecipeRepo
 import java.sql.DriverManager
 import java.sql.ResultSet
+import java.sql.SQLException
 import java.sql.Statement
 
 class SQLiteRecipeRepo(val s: Statement) : RecipeRepo {
@@ -33,7 +34,11 @@ class SQLiteRecipeRepo(val s: Statement) : RecipeRepo {
 
     // TODO: this should probably be in a parent class.
     private fun update(sql: String): Int {
-        return s.executeUpdate(sql)
+        try {
+            return s.executeUpdate(sql)
+        } catch (e: SQLException) {
+            return -1
+        }
     }
 
     // TODO: this should probably be in a parent class.
