@@ -1,6 +1,7 @@
 package db
 
 import entities.Recipe
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,7 +24,7 @@ internal class SQLiteRecipeRepoTest {
     val recipe = Recipe(id = id, name = name, version = version)
     val sqlite = SQLiteRecipeRepo(s = statementSpy)
 
-    @BeforeAll
+    @BeforeEach
     fun initializeMocks() {
         Mockito.`when`(resultSetFake.getInt("id")).thenReturn(id)
         Mockito.`when`(resultSetFake.getString("name")).thenReturn(name)
@@ -39,6 +40,11 @@ internal class SQLiteRecipeRepoTest {
     }
 
     @Test
+    fun `when the creation is a success, returns 0`() {
+        assertEquals(0, sqlite.create(recipe = recipe))
+    }
+
+    @Test
     fun `sends the correct query to find recipe by id`() {
         sqlite.findById(id = id)
 
@@ -46,9 +52,29 @@ internal class SQLiteRecipeRepoTest {
     }
 
     @Test
+    fun `when there is a corresponding recipe in the db, returns the Recipe`() {
+        val result = sqlite.findById(id = id)
+
+        // TODO: figure out how to do deep equality in tests.
+        assertEquals(recipe.id, result.id)
+        assertEquals(recipe.name, result.name)
+        assertEquals(recipe.version, result.version)
+    }
+
+    @Test
     fun `send the correct query to find recipe by name and version`() {
         sqlite.findByNameAndVersion(name = name, version = version)
 
         Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes WHERE name LIKE $name AND version LIKE $version")
+    }
+
+    @Test
+    fun `when there is a recipe with the given name and version in the db, returns the Recipe`() {
+        val result = sqlite.findByNameAndVersion(name = name, version = version)
+
+        // TODO: figure out how to do deep equality in tests.
+        assertEquals(recipe.id, result?.id)
+        assertEquals(recipe.name, result?.name)
+        assertEquals(recipe.version, result?.version)
     }
 }
