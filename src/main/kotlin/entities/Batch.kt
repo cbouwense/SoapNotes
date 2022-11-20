@@ -1,12 +1,15 @@
 package entities
 
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneOffset
 
 class Batch (
-    val number: Int = 0,
-    val flavor: String = "",
-    val pourDate: LocalDate = LocalDate.now(),
-    val cureDate: LocalDate =  LocalDate.now().plusWeeks(6),
+    val id: Int = 0,
+    val name: String = "",
+    val pourDate: Int = LocalDate.now().toEpochSecond(LocalTime.now(), ZoneOffset.UTC).toInt(),
+    val cureDate: Int = LocalDate.now().plusWeeks(6).toEpochSecond(LocalTime.now(), ZoneOffset.UTC).toInt(),
     val recipe: Recipe? = null,
     val bars: ArrayList<Bar> = arrayListOf(),
 ) {
@@ -24,11 +27,14 @@ class Batch (
     }
 
     fun isCured(): Boolean {
-        return cureDate.isEqual(LocalDate.now()) || cureDate.isBefore(LocalDate.now())
+        return (
+            cureDate == LocalDate.now().toEpochSecond(LocalTime.now(), ZoneOffset.UTC).toInt() ||
+            cureDate < LocalDate.now().toEpochSecond(LocalTime.now(), ZoneOffset.UTC).toInt()
+        )
     }
 
     override fun toString(): String {
-        if (recipe == null) return "Batch #$number: $flavor"
-        return "Batch #$number: $flavor (${recipe.name} ${recipe.version})"
+        if (recipe == null) return "Batch #$id: $name"
+        return "Batch #$id: $name (${recipe.name} ${recipe.version})"
     }
 }

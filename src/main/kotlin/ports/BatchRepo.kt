@@ -1,9 +1,11 @@
 package ports
 
-import entities.Recipe
+import entities.Batch
 
 interface BatchRepo {
-    fun create(recipe: Recipe): Int
-    fun findById(id: Int): Recipe?
-    fun findByName(name: String): Recipe?
+    fun create(b: Batch): Int
+    fun findById(id: Int): Batch?
+    fun findByName(name: String): Batch?
+    fun findByPourDate(pourDate: Int): Batch?
+    fun getAll(): List<Batch>
 }

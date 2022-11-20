@@ -2,7 +2,6 @@ package db
 
 import entities.Recipe
 import ports.RecipeRepo
-import java.sql.DriverManager
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
@@ -13,7 +12,7 @@ class SQLiteRecipeRepo(val s: Statement) : RecipeRepo {
     }
 
     override fun findById(id: Int): Recipe {
-        val result = query("SELECT * FROM recipes WHERE id LIKE ${id}")
+        val result = query("SELECT * FROM recipes WHERE id = ${id}")
 
         return Recipe(
             id = result.getInt("id"),
@@ -23,7 +22,7 @@ class SQLiteRecipeRepo(val s: Statement) : RecipeRepo {
     }
 
     override fun findByNameAndVersion(name: String, version: String): Recipe? {
-        val result = query("SELECT * FROM recipes WHERE name LIKE ${name} AND version LIKE ${version}")
+        val result = query("SELECT * FROM recipes WHERE name = ${name} AND version = ${version}")
 
         return Recipe(
             id = result.getInt("id"),

@@ -65,7 +65,7 @@ internal class SQLiteRecipeRepoTest {
         fun `sends the correct query to find recipe by id`() {
             sqlite.findById(id = id)
 
-            Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes WHERE id LIKE $id")
+            Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes WHERE id = $id")
         }
 
         @Test
@@ -83,7 +83,7 @@ internal class SQLiteRecipeRepoTest {
             sqlite.findByNameAndVersion(name = name, version = version)
 
             Mockito.verify(statementSpy, times(1))
-                .executeQuery("SELECT * FROM recipes WHERE name LIKE $name AND version LIKE $version")
+                .executeQuery("SELECT * FROM recipes WHERE name = $name AND version = $version")
         }
 
         @Test

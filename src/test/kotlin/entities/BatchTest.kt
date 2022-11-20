@@ -6,13 +6,15 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneOffset
 
 internal class BatchTest {
     @Test
-    fun `it defaults the batch number to 0`() {
+    fun `it defaults the batch id to 0`() {
         val batch = Batch()
 
-        assertEquals(0, batch.number)
+        assertEquals(0, batch.id)
     }
 
     @Test
@@ -23,17 +25,17 @@ internal class BatchTest {
     }
 
     @Test
-    fun `it defaults the flavor to null`() {
+    fun `it defaults the name to null`() {
         val batch = Batch()
 
-        assertEquals("", batch.flavor)
+        assertEquals("", batch.name)
     }
 
     @Test
-    fun `given a flavor, it should initialize its to what is given`() {
-        val batch = Batch(flavor = "Coffee")
+    fun `given a name, it should initialize its to what is given`() {
+        val batch = Batch(name = "Coffee")
 
-        assertEquals("Coffee", batch.flavor)
+        assertEquals("Coffee", batch.name)
     }
 
     @Test
@@ -83,7 +85,7 @@ internal class BatchTest {
     @Nested
     inner class CutIntoBars {
         @Test
-        fun `given 0 bars to cut, it should not increase the number of bars in the batch`() {
+        fun `given 0 bars to cut, it should not increase the id of bars in the batch`() {
             val batch = Batch()
 
             batch.cutIntoBars(0)
@@ -92,7 +94,7 @@ internal class BatchTest {
         }
 
         @Test
-        fun `given 1 bar to cut, it should increase the number of bars to 1`() {
+        fun `given 1 bar to cut, it should increase the id of bars to 1`() {
             val batch = Batch()
 
             batch.cutIntoBars(1)
@@ -102,7 +104,7 @@ internal class BatchTest {
 
         @Test
         fun `given 1 bar to cut, it should add a bar with the recipe to its list`() {
-            val batch1 = Batch(number = 1)
+            val batch1 = Batch(id = 1)
 
             batch1.cutIntoBars(1)
 
@@ -110,8 +112,8 @@ internal class BatchTest {
         }
 
         @Test
-        fun `given 12 bars to cut, it should increase the number of bars to 12`() {
-            val batch = Batch(number = 42)
+        fun `given 12 bars to cut, it should increase the id of bars to 12`() {
+            val batch = Batch(id = 42)
 
             batch.cutIntoBars(12)
 
@@ -123,21 +125,21 @@ internal class BatchTest {
     inner class IsCured {
         @Test
         fun `when the cure date is tomorrow, it should return false`() {
-            val batch = Batch(cureDate = LocalDate.now().plusDays(1))
+            val batch = Batch(cureDate = LocalDate.now().toEpochSecond(LocalTime.now(), ZoneOffset.UTC).toInt())
 
             assertFalse(batch.isCured())
         }
 
         @Test
         fun `when the cure date is today, it should return true`() {
-            val batch = Batch(cureDate = LocalDate.now())
+            val batch = Batch(cureDate = LocalDate.now().toEpochSecond(LocalTime.now(), ZoneOffset.UTC).toInt())
 
             assertTrue(batch.isCured())
         }
 
         @Test
         fun `when the cure date is yesterday, it should return true`() {
-            val batch = Batch(cureDate = LocalDate.now().minusDays(1))
+            val batch = Batch(cureDate = LocalDate.now().minusDays(1).toEpochSecond(LocalTime.now(), ZoneOffset.UTC).toInt())
 
             assertTrue(batch.isCured())
         }
@@ -146,8 +148,8 @@ internal class BatchTest {
     @Nested
     inner class ToString {
         @Test
-        fun `when the recipe is null, it just returns the batch number and recipe`() {
-            val batch = Batch(number = 1738, flavor = "Lavender")
+        fun `when the recipe is null, it just returns the batch id and recipe`() {
+            val batch = Batch(id = 1738, name = "Lavender")
 
             assertEquals("Batch #1738: Lavender", batch.toString())
         }
@@ -159,9 +161,9 @@ internal class BatchTest {
                 version = "v2.0.2",
             )
             val batch = Batch(
-                number = 42,
+                id = 42,
                 recipe = recipe,
-                flavor = "Coffee"
+                name = "Coffee"
             )
 
             assertEquals("Batch #42: Coffee (Muppy Bar v2.0.2)", batch.toString())
