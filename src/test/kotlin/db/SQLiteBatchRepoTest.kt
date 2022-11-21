@@ -1,19 +1,18 @@
 package db
 
 import entities.Batch
-import entities.Recipe
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.*
 import ports.RecipeRepo
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
+
 
 internal class SQLiteBatchRepoTest {
     val resultSetFake = mock(ResultSet::class.java)
@@ -22,14 +21,18 @@ internal class SQLiteBatchRepoTest {
 
     val id = 42
     val name = "the answer"
-    val batch = Batch(id = id, name = name)
-    val recipe = Recipe()
-    val sqlite = SQLiteBatchRepo(s = statementSpy)
+    val pourDate = 1337
+    val cureDate = 1738
+    val batch = Batch(id = id, name = name, pourDate = pourDate, cureDate = cureDate)
+
+    val sqlite = SQLiteBatchRepo(s = statementSpy, recipeRepo = recipeRepoFake)
 
     @BeforeEach
     fun beforeEach() {
         `when`(resultSetFake.getInt("id")).thenReturn(id)
         `when`(resultSetFake.getString("name")).thenReturn(name)
+        `when`(resultSetFake.getInt("pour_date")).thenReturn(pourDate)
+        `when`(resultSetFake.getInt("cure_date")).thenReturn(cureDate)
         `when`(statementSpy.executeQuery(anyString())).thenReturn(resultSetFake)
     }
 
@@ -64,7 +67,6 @@ internal class SQLiteBatchRepoTest {
     inner class FindById {
         @Test
         fun `sends the correct query to find batch by id`() {
-            `when`(recipeRepoFake.findById(1337)).thenReturn(recipe)
             sqlite.findById(id)
 
             verify(statementSpy, times(1)).executeQuery("SELECT * FROM batches WHERE id = $id")
@@ -78,46 +80,46 @@ internal class SQLiteBatchRepoTest {
         }
     }
 
-//    @Nested
-//    inner class GetAll {
-//        val recipe1 = Recipe(id = id, name = "${name}0", version = "${version}.0")
-//        val recipe2 = Recipe(id = id + 1, name = "${name}1", version = "${version}.1")
-//        val recipe3 = Recipe(id = id + 2, name = "${name}2", version = "${version}.2")
-//
-//        @BeforeEach
-//        fun beforeEach() {
-//            Mockito.`when`(resultSetFake.getInt("id"))
-//                .thenReturn(recipe1.id)
-//                .thenReturn(recipe2.id)
-//                .thenReturn(recipe3.id)
-//            Mockito.`when`(resultSetFake.getString("name"))
-//                .thenReturn(recipe1.name)
-//                .thenReturn(recipe2.name)
-//                .thenReturn(recipe3.name)
-//            Mockito.`when`(resultSetFake.getString("version"))
-//                .thenReturn(recipe1.version)
-//                .thenReturn(recipe2.version)
-//                .thenReturn(recipe3.version)
-//            Mockito.`when`(resultSetFake.next())
-//                .thenReturn(true)
-//                .thenReturn(true)
-//                .thenReturn(true)
-//                .thenReturn(false)
-//            Mockito.`when`(statementSpy.executeQuery(anyString())).thenReturn(resultSetFake)
-//        }
-//
-//        @Test
-//        fun `sends the correct query to get all recipes`() {
-//            sqlite.getAll()
-//
-//            Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes")
-//        }
-//
-//        @Test
-//        fun `when there are recipe in the db, returns a list of Recipes`() {
-//            val result = sqlite.getAll()
-//
-//            assertThat(result).usingRecursiveComparison().isEqualTo(listOf(recipe1, recipe2, recipe3))
-//        }
-//    }
+    @Nested
+    inner class GetAll {
+        val recipe1 = Recipe(id = id, name = "${name}0", version = "${version}.0")
+        val recipe2 = Recipe(id = id + 1, name = "${name}1", version = "${version}.1")
+        val recipe3 = Recipe(id = id + 2, name = "${name}2", version = "${version}.2")
+
+        @BeforeEach
+        fun beforeEach() {
+            Mockito.`when`(resultSetFake.getInt("id"))
+                .thenReturn(recipe1.id)
+                .thenReturn(recipe2.id)
+                .thenReturn(recipe3.id)
+            Mockito.`when`(resultSetFake.getString("name"))
+                .thenReturn(recipe1.name)
+                .thenReturn(recipe2.name)
+                .thenReturn(recipe3.name)
+            Mockito.`when`(resultSetFake.getString("version"))
+                .thenReturn(recipe1.version)
+                .thenReturn(recipe2.version)
+                .thenReturn(recipe3.version)
+            Mockito.`when`(resultSetFake.next())
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(false)
+            Mockito.`when`(statementSpy.executeQuery(anyString())).thenReturn(resultSetFake)
+        }
+
+        @Test
+        fun `sends the correct query to get all recipes`() {
+            sqlite.getAll()
+
+            Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes")
+        }
+
+        @Test
+        fun `when there are recipe in the db, returns a list of Recipes`() {
+            val result = sqlite.getAll()
+
+            assertThat(result).usingRecursiveComparison().isEqualTo(listOf(recipe1, recipe2, recipe3))
+        }
+    }
 }

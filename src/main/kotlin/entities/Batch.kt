@@ -1,17 +1,14 @@
 package entities
 
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneOffset
+import java.time.*
 
 class Batch (
     val id: Int = 0,
     val name: String = "",
-    val pourDate: Int = LocalDate.now().toEpochSecond(LocalTime.now(), ZoneOffset.UTC).toInt(),
-    val cureDate: Int = LocalDate.now().plusWeeks(6).toEpochSecond(LocalTime.now(), ZoneOffset.UTC).toInt(),
     val recipe: Recipe? = null,
     val bars: ArrayList<Bar> = arrayListOf(),
+    val pourDate: Int = 0,
+    val cureDate: Int = 0,
 ) {
     fun cutIntoBars(barCount: Int) {
         (1..barCount).iterator().forEach {

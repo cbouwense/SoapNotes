@@ -2,18 +2,19 @@ package db
 
 import entities.Batch
 import ports.BatchRepo
+import ports.RecipeRepo
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
 
-class SQLiteBatchRepo(val s: Statement) : BatchRepo {
+class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo {
     override fun create(b: Batch): Int {
         return update("INSERT INTO batches VALUES(${b.id}, '${b.name}')")
     }
 
     override fun findById(id: Int): Batch? {
         val result = query("SELECT * FROM batches WHERE id = ${id}")
-        val recipe = SQLiteRecipeRepo(s).findById(result.getInt("recipe_id"))
+        val recipe = recipeRepo.findById(result.getInt("recipe_id"))
 
         return Batch(
             id = result.getInt("id"),
@@ -25,7 +26,7 @@ class SQLiteBatchRepo(val s: Statement) : BatchRepo {
     }
 
     override fun findByName(name: String): Batch? {
-        return Batch()
+        return Batch(pourDate = 0, cureDate = 9)
     }
 
     override fun findByPourDate(pourDate: Int): Batch? {
@@ -41,7 +42,9 @@ class SQLiteBatchRepo(val s: Statement) : BatchRepo {
             listOfBatches.add(
                 Batch(
                     id = result.getInt("id"),
-                    name = result.getString("name")
+                    name = result.getString("name"),
+                    pourDate = result.getInt("pour_date"),
+                    cureDate = result.getInt("cure_date")
                 )
             )
         }
