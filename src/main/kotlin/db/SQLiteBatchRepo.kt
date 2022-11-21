@@ -12,6 +12,27 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
         return update("INSERT INTO batches VALUES(${b.id}, '${b.name}')")
     }
 
+    override fun getAll(): List<Batch> {
+        val result = query("SELECT * FROM batches")
+
+        val listOfBatches = ArrayList<Batch>()
+
+        while (result.next()) {
+            val recipe = recipeRepo.findById(result.getInt("recipe_id"))
+            listOfBatches.add(
+                Batch(
+                    id = result.getInt("id"),
+                    name = result.getString("name"),
+                    pourDate = result.getInt("pour_date"),
+                    cureDate = result.getInt("cure_date"),
+                    recipe = recipe
+                )
+            )
+        }
+
+        return listOfBatches.toList()
+    }
+
     override fun findById(id: Int): Batch? {
         val result = query("SELECT * FROM batches WHERE id = ${id}")
         val recipe = recipeRepo.findById(result.getInt("recipe_id"))
@@ -26,30 +47,29 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
     }
 
     override fun findByName(name: String): Batch? {
-        return Batch(pourDate = 0, cureDate = 9)
+        val result = query("SELECT * FROM batches WHERE name = ${name}")
+        val recipe = recipeRepo.findById(result.getInt("recipe_id"))
+
+        return Batch(
+            id = result.getInt("id"),
+            name = result.getString("name"),
+            pourDate = result.getInt("pour_date"),
+            cureDate = result.getInt("cure_date"),
+            recipe = recipe
+        )
     }
 
     override fun findByPourDate(pourDate: Int): Batch? {
-        TODO("Not yet implemented")
-    }
+        val result = query("SELECT * FROM batches WHERE pour_date = ${pourDate}")
+        val recipe = recipeRepo.findById(result.getInt("recipe_id"))
 
-    override fun getAll(): List<Batch> {
-        val result = query("SELECT * FROM recipes")
-
-        val listOfBatches = ArrayList<Batch>()
-
-        while (result.next()) {
-            listOfBatches.add(
-                Batch(
-                    id = result.getInt("id"),
-                    name = result.getString("name"),
-                    pourDate = result.getInt("pour_date"),
-                    cureDate = result.getInt("cure_date")
-                )
-            )
-        }
-
-        return listOfBatches.toList()
+        return Batch(
+            id = result.getInt("id"),
+            name = result.getString("name"),
+            pourDate = result.getInt("pour_date"),
+            cureDate = result.getInt("cure_date"),
+            recipe = recipe
+        )
     }
 
     // TODO: this should probably be in a parent class.

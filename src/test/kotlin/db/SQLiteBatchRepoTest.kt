@@ -64,6 +64,53 @@ internal class SQLiteBatchRepoTest {
     }
 
     @Nested
+    inner class GetAll {
+        val batch1 = Batch(id = id, name = "${name}1", pourDate = id + 1, cureDate = id + 11)
+        val batch2 = Batch(id = id + 1, name = "${name}2", pourDate = id + 2, cureDate = id + 12)
+        val batch3 = Batch(id = id + 2, name = "${name}3", pourDate = id + 3, cureDate = id + 13)
+
+        @BeforeEach
+        fun beforeEach() {
+            `when`(resultSetFake.getInt("id"))
+                .thenReturn(batch1.id)
+                .thenReturn(batch2.id)
+                .thenReturn(batch3.id)
+            `when`(resultSetFake.getString("name"))
+                .thenReturn(batch1.name)
+                .thenReturn(batch2.name)
+                .thenReturn(batch3.name)
+            `when`(resultSetFake.getInt("pour_date"))
+                .thenReturn(batch1.pourDate)
+                .thenReturn(batch2.pourDate)
+                .thenReturn(batch3.pourDate)
+            `when`(resultSetFake.getInt("cure_date"))
+                .thenReturn(batch1.cureDate)
+                .thenReturn(batch2.cureDate)
+                .thenReturn(batch3.cureDate)
+            `when`(resultSetFake.next())
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(true)
+                .thenReturn(false)
+            `when`(statementSpy.executeQuery(anyString())).thenReturn(resultSetFake)
+        }
+
+        @Test
+        fun `sends the correct query to get all recipes`() {
+            sqlite.getAll()
+
+            verify(statementSpy, times(1)).executeQuery("SELECT * FROM batches")
+        }
+
+        @Test
+        fun `when there are recipe in the db, returns a list of Recipes`() {
+            val result = sqlite.getAll()
+
+            assertThat(result).usingRecursiveComparison().isEqualTo(listOf(batch1, batch2, batch3))
+        }
+    }
+
+    @Nested
     inner class FindById {
         @Test
         fun `sends the correct query to find batch by id`() {
@@ -81,45 +128,36 @@ internal class SQLiteBatchRepoTest {
     }
 
     @Nested
-    inner class GetAll {
-        val recipe1 = Recipe(id = id, name = "${name}0", version = "${version}.0")
-        val recipe2 = Recipe(id = id + 1, name = "${name}1", version = "${version}.1")
-        val recipe3 = Recipe(id = id + 2, name = "${name}2", version = "${version}.2")
+    inner class FindByName {
+        @Test
+        fun `sends the correct query to find batch by name`() {
+            sqlite.findByName(name)
 
-        @BeforeEach
-        fun beforeEach() {
-            Mockito.`when`(resultSetFake.getInt("id"))
-                .thenReturn(recipe1.id)
-                .thenReturn(recipe2.id)
-                .thenReturn(recipe3.id)
-            Mockito.`when`(resultSetFake.getString("name"))
-                .thenReturn(recipe1.name)
-                .thenReturn(recipe2.name)
-                .thenReturn(recipe3.name)
-            Mockito.`when`(resultSetFake.getString("version"))
-                .thenReturn(recipe1.version)
-                .thenReturn(recipe2.version)
-                .thenReturn(recipe3.version)
-            Mockito.`when`(resultSetFake.next())
-                .thenReturn(true)
-                .thenReturn(true)
-                .thenReturn(true)
-                .thenReturn(false)
-            Mockito.`when`(statementSpy.executeQuery(anyString())).thenReturn(resultSetFake)
+            verify(statementSpy, times(1)).executeQuery("SELECT * FROM batches WHERE name = $name")
         }
 
         @Test
-        fun `sends the correct query to get all recipes`() {
-            sqlite.getAll()
+        fun `when there is a corresponding batch in the db, returns the Batch`() {
+            val result = sqlite.findByName(name)
 
-            Mockito.verify(statementSpy, times(1)).executeQuery("SELECT * FROM recipes")
+            assertThat(result).usingRecursiveComparison().isEqualTo(batch)
+        }
+    }
+
+    @Nested
+    inner class FindByPourDate {
+        @Test
+        fun `sends the correct query to find batch by pour date`() {
+            sqlite.findByPourDate(pourDate)
+
+            verify(statementSpy, times(1)).executeQuery("SELECT * FROM batches WHERE pour_date = $pourDate")
         }
 
         @Test
-        fun `when there are recipe in the db, returns a list of Recipes`() {
-            val result = sqlite.getAll()
+        fun `when there is a corresponding batch in the db, returns the Batch`() {
+            val result = sqlite.findByPourDate(pourDate)
 
-            assertThat(result).usingRecursiveComparison().isEqualTo(listOf(recipe1, recipe2, recipe3))
+            assertThat(result).usingRecursiveComparison().isEqualTo(batch)
         }
     }
 }
