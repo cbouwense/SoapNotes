@@ -3,6 +3,7 @@ package entities
 import java.util.*
 
 class Product(
+    val id: Int = 0,
     var name: String = "",
     val netWeightAmount: Float = 0.0f,
     val netWeightUnit: MeasurementUnit = MeasurementUnit.OUNCES,
