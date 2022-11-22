@@ -9,7 +9,7 @@ import java.sql.Statement
 
 class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo {
     override fun create(b: Batch): Int {
-        return update("INSERT INTO batches VALUES(${b.id}, ${b.pourDate}, ${b.cureDate}, '${b.name}', 42)")
+        return update("INSERT INTO batches VALUES (NULL, ${b.pourDate}, ${b.cureDate}, '${b.name}', 42)")
     }
 
     override fun getAll(): List<Batch> {
