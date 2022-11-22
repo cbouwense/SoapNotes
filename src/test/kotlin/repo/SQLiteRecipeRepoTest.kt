@@ -1,4 +1,4 @@
-package db
+package repo
 
 import entities.Recipe
 import org.assertj.core.api.Assertions.assertThat
@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito
 import org.mockito.Mockito.anyString
 import org.mockito.Mockito.times
+import use_cases.repo.SQLiteRecipeRepo
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
@@ -136,4 +136,20 @@ internal class SQLiteRecipeRepoTest {
             assertThat(result).usingRecursiveComparison().isEqualTo(listOf(recipe1, recipe2, recipe3))
         }
     }
+
+    @Nested
+    inner class GetMaxId {
+        @Test
+        fun `send the correct query to find latest recipe id`() {
+            sqlite.getMaxId()
+
+            Mockito.verify(statementSpy, times(1)).executeQuery("SELECT MAX(id) FROM recipes")
+        }
+
+        @Test
+        fun `when there is a recipe with the given name and version in the db, returns the Recipe`() {
+            assertEquals(42, sqlite.getMaxId())
+        }
+    }
+
 }

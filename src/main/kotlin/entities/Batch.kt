@@ -6,10 +6,11 @@ class Batch (
     val id: Int = 0,
     val name: String = "",
     val recipe: Recipe? = null,
-    val bars: ArrayList<Bar> = arrayListOf(),
-    val pourDate: Int = 0,
-    val cureDate: Int = 0,
+    val pourDate: Long = 0,
+    val cureDate: Long = 0,
 ) {
+    val bars: ArrayList<Bar> = arrayListOf()
+
     fun cutIntoBars(barCount: Int) {
         (1..barCount).iterator().forEach {
             this.bars.add(Bar(batch = this))
@@ -25,8 +26,8 @@ class Batch (
 
     fun isCured(): Boolean {
         return (
-            cureDate == LocalDate.now().toEpochSecond(LocalTime.now(), ZoneOffset.UTC).toInt() ||
-            cureDate < LocalDate.now().toEpochSecond(LocalTime.now(), ZoneOffset.UTC).toInt()
+            cureDate == LocalDate.now().toEpochSecond(LocalTime.now(), ZoneOffset.UTC) ||
+            cureDate < LocalDate.now().toEpochSecond(LocalTime.now(), ZoneOffset.UTC)
         )
     }
 

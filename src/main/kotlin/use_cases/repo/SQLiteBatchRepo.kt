@@ -1,4 +1,4 @@
-package db
+package use_cases.repo
 
 import entities.Batch
 import ports.BatchRepo
@@ -9,7 +9,7 @@ import java.sql.Statement
 
 class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo {
     override fun create(b: Batch): Int {
-        return update("INSERT INTO batches VALUES(${b.id}, '${b.name}')")
+        return update("INSERT INTO batches VALUES(${b.id}, ${b.pourDate}, ${b.cureDate}, '${b.name}', 42)")
     }
 
     override fun getAll(): List<Batch> {
@@ -23,8 +23,8 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
                 Batch(
                     id = result.getInt("id"),
                     name = result.getString("name"),
-                    pourDate = result.getInt("pour_date"),
-                    cureDate = result.getInt("cure_date"),
+                    pourDate = result.getLong("pour_date"),
+                    cureDate = result.getLong("cure_date"),
                     recipe = recipe
                 )
             )
@@ -40,8 +40,8 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
         return Batch(
             id = result.getInt("id"),
             name = result.getString("name"),
-            pourDate = result.getInt("pour_date"),
-            cureDate = result.getInt("cure_date"),
+            pourDate = result.getLong("pour_date"),
+            cureDate = result.getLong("cure_date"),
             recipe = recipe
         )
     }
@@ -53,8 +53,8 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
         return Batch(
             id = result.getInt("id"),
             name = result.getString("name"),
-            pourDate = result.getInt("pour_date"),
-            cureDate = result.getInt("cure_date"),
+            pourDate = result.getLong("pour_date"),
+            cureDate = result.getLong("cure_date"),
             recipe = recipe
         )
     }
@@ -66,8 +66,8 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
         return Batch(
             id = result.getInt("id"),
             name = result.getString("name"),
-            pourDate = result.getInt("pour_date"),
-            cureDate = result.getInt("cure_date"),
+            pourDate = result.getLong("pour_date"),
+            cureDate = result.getLong("cure_date"),
             recipe = recipe
         )
     }
@@ -77,6 +77,7 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
         try {
             return s.executeUpdate(sql)
         } catch (e: SQLException) {
+            println(e.toString())
             return -1
         }
     }

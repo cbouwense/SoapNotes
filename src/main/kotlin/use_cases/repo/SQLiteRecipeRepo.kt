@@ -1,4 +1,4 @@
-package db
+package use_cases.repo
 
 import entities.Recipe
 import ports.RecipeRepo
@@ -47,6 +47,11 @@ class SQLiteRecipeRepo(val s: Statement) : RecipeRepo {
         }
 
         return listOfRecipes.toList()
+    }
+
+    override fun getMaxId(): Int {
+        val result = query("SELECT MAX(id) FROM recipes")
+        return result.getInt("MAX(id)")
     }
 
     // TODO: this should probably be in a parent class.
