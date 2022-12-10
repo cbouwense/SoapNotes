@@ -1,6 +1,7 @@
 package use_cases.repo
 
 import entities.Batch
+import entities.Product
 import ports.BatchRepo
 import ports.RecipeRepo
 import java.sql.ResultSet
@@ -14,25 +15,12 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
 
     override fun getAll(): List<Batch> {
         val result = query("SELECT * FROM batches")
-
         val listOfBatches = ArrayList<Batch>()
 
         while (result.next()) {
-            val batchId = result.getInt("id")
-            val batchName = result.getString("name")
-            val pourDate = result.getLong("pour_date")
-            val cureDate = result.getLong("cure_date")
-            val recipe = recipeRepo.findById(result.getInt("recipe_id"))
-
-            listOfBatches.add(
-                Batch(
-                    id = batchId,
-                    name = batchName,
-                    pourDate = pourDate,
-                    cureDate = cureDate,
-                    recipe = recipe
-                )
-            )
+            val batch = translateResultSetToEntity(result)
+            if (batch == null) break
+            listOfBatches.add(batch)
         }
 
         return listOfBatches.toList()
@@ -40,39 +28,33 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
 
     override fun findById(id: Int): Batch? {
         val result = query("SELECT * FROM batches WHERE id = ${id}")
-        val recipe = recipeRepo.findById(result.getInt("recipe_id"))
-
-        return Batch(
-            id = result.getInt("id"),
-            name = result.getString("name"),
-            pourDate = result.getLong("pour_date"),
-            cureDate = result.getLong("cure_date"),
-            recipe = recipe
-        )
+        return translateResultSetToEntity(result)
     }
 
     override fun findByName(name: String): Batch? {
         val result = query("SELECT * FROM batches WHERE name = ${name}")
-        val recipe = recipeRepo.findById(result.getInt("recipe_id"))
-
-        return Batch(
-            id = result.getInt("id"),
-            name = result.getString("name"),
-            pourDate = result.getLong("pour_date"),
-            cureDate = result.getLong("cure_date"),
-            recipe = recipe
-        )
+        return translateResultSetToEntity(result)
     }
 
     override fun findByPourDate(pourDate: Int): Batch? {
         val result = query("SELECT * FROM batches WHERE pour_date = ${pourDate}")
-        val recipe = recipeRepo.findById(result.getInt("recipe_id"))
+        return translateResultSetToEntity(result)
+    }
+
+    fun translateResultSetToEntity(r: ResultSet): Batch? {
+        val batchId = r.getInt("id")
+        val batchName = r.getString("name")
+        val pourDate = r.getLong("pour_date")
+        val cureDate = r.getLong("cure_date")
+        val recipe = recipeRepo.findById(r.getInt("recipe_id"))
+
+        if (batchId == null || batchName == null || pourDate == null || cureDate == null || recipe == null) return null
 
         return Batch(
-            id = result.getInt("id"),
-            name = result.getString("name"),
-            pourDate = result.getLong("pour_date"),
-            cureDate = result.getLong("cure_date"),
+            id = batchId,
+            name = batchName,
+            pourDate = pourDate,
+            cureDate = cureDate,
             recipe = recipe
         )
     }

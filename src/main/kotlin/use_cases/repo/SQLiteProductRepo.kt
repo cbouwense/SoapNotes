@@ -1,6 +1,5 @@
 package use_cases.repo
 
-import entities.MeasurementUnit
 import entities.Product
 import ports.ProductRepo
 import java.sql.ResultSet
@@ -18,15 +17,9 @@ class SQLiteProductRepo(val s: Statement) : ProductRepo {
         val listOfProducts = ArrayList<Product>()
 
         while (result.next()) {
-            listOfProducts.add(
-                Product(
-                    id = result.getInt("id"),
-                    name = result.getString("name"),
-                    netWeightAmount = result.getFloat("total_grams"),
-                    netWeightUnit = MeasurementUnit.GRAMS,
-                    priceInCents = result.getInt("total_cents")
-                )
-            )
+            val product = translateResultSetToEntity(result)
+            if (product == null) break
+            listOfProducts.add(product)
         }
 
         return listOfProducts.toList()
@@ -34,24 +27,27 @@ class SQLiteProductRepo(val s: Statement) : ProductRepo {
 
     override fun findById(id: Int): Product? {
         val result = query("SELECT * FROM products WHERE id = ${id}")
-
-        return Product(
-            id = result.getInt("id"),
-            name = result.getString("name"),
-            netWeightAmount = result.getFloat("total_grams"),
-            priceInCents = result.getInt("total_cents")
-        )
+        return translateResultSetToEntity(result)
     }
 
     override fun findByName(name: String): Product? {
         val result = query("SELECT * FROM products WHERE name = ${name}")
+        return translateResultSetToEntity(result)
+    }
+
+    fun translateResultSetToEntity(r: ResultSet): Product? {
+        val productId = r.getInt("id")
+        val productName = r.getString("name")
+        val totalGrams = r.getFloat("total_grams")
+        val totalCents = r.getInt("total_cents")
+
+        if (productId == null || productName == null || totalGrams == null || totalCents == null) return null
 
         return Product(
-            id = result.getInt("id"),
-            name = result.getString("name"),
-            netWeightAmount = result.getFloat("total_grams"),
-            netWeightUnit = MeasurementUnit.GRAMS,
-            priceInCents = result.getInt("total_cents")
+            id = productId,
+            name = productName,
+            netWeightAmount = totalGrams,
+            priceInCents = totalCents
         )
     }
 
@@ -67,6 +63,6 @@ class SQLiteProductRepo(val s: Statement) : ProductRepo {
 
     // TODO: this should probably be in a parent class.
     private fun query(sql: String): ResultSet {
-            return s.executeQuery(sql)
-        }
+        return s.executeQuery(sql)
+    }
 }
