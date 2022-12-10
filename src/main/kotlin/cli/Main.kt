@@ -5,6 +5,7 @@ import use_cases.repo.SQLiteRecipeRepo
 import use_cases.CreateBatch
 import use_cases.CreateProduct
 import use_cases.CreateRecipe
+import use_cases.GetAllProducts
 import use_cases.repo.SQLiteBatchRepo
 import use_cases.repo.SQLiteProductRepo
 import java.sql.DriverManager
@@ -39,8 +40,8 @@ fun displayMenu() {
     println("+---+---------------+")
     println("| 1 | Add batch     |")
     println("| 2 | Add product   |")
-    println("| 3 | View batches  |")
-    println("| 4 | View recipes  |")
+    println("| 3 | List batches  |")
+    println("| 4 | List products |")
     println("| 0 | Exit          |")
     println("+---+---------------+")
     println("")
@@ -51,9 +52,19 @@ fun runCommand(c: Int) {
         1 -> addBatch()
         2 -> addProduct()
         3 -> println("Not implemented yet")
-        4 -> println("Not implemented yet")
+        4 -> listProducts()
         else -> println("Unknown command")
     }
+}
+
+fun listProducts() {
+    val products = GetAllProducts(SQLiteProductRepo(s)).run()
+    println("----------------")
+    println("Products")
+    println("----------------")
+    products.forEach{ println("| ${it.id}\t| ${it.name}\t| ${it.netWeightAmount}\t| ${it.priceInCents}") }
+    println("----------------")
+    println("")
 }
 
 fun addBatch() {
@@ -76,6 +87,7 @@ fun addBatch() {
     println("Products used")
     println("----------------")
     do {
+        listProducts()
         print("Product ((g)-(product_id)): ")
         val productRaw = input.nextLine()
         if (productRaw != "") productsRaw.add(productRaw)
