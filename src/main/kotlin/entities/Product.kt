@@ -6,7 +6,7 @@ class Product(
     val id: Int = 0,
     var name: String = "",
     val netWeightAmount: Float = 0.0f,
-    val netWeightUnit: MeasurementUnit = MeasurementUnit.OUNCES,
+    val netWeightUnit: MeasurementUnit = MeasurementUnit.GRAMS,
     val priceInCents: Int = 0,
 ) {
     fun getCentsPerGram(): Int {

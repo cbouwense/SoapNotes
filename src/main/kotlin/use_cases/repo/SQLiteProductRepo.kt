@@ -39,7 +39,6 @@ class SQLiteProductRepo(val s: Statement) : ProductRepo {
             id = result.getInt("id"),
             name = result.getString("name"),
             netWeightAmount = result.getFloat("total_grams"),
-            netWeightUnit = MeasurementUnit.GRAMS,
             priceInCents = result.getInt("total_cents")
         )
     }

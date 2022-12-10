@@ -8,7 +8,9 @@ import java.sql.Statement
 
 class SQLiteRecipeRepo(val s: Statement) : RecipeRepo {
     override fun create(recipe: Recipe): Int {
-        return update("INSERT INTO recipes VALUES(${recipe.id}, '${recipe.name}', '${recipe.version}')")
+        val recipeReturn = update("INSERT INTO recipes VALUES(NULL, '${recipe.name}', '${recipe.version}')")
+        println("recipeReturn: $recipeReturn")
+        return recipeReturn
     }
 
     override fun findById(id: Int): Recipe {
@@ -59,6 +61,7 @@ class SQLiteRecipeRepo(val s: Statement) : RecipeRepo {
         try {
             return s.executeUpdate(sql)
         } catch (e: SQLException) {
+            println(e.toString())
             return -1
         }
     }

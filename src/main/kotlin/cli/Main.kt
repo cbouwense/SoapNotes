@@ -1,10 +1,7 @@
 package cli
 
-import entities.Batch
-import entities.MeasurementUnit
-import entities.Product
+import entities.*
 import use_cases.repo.SQLiteRecipeRepo
-import entities.Recipe
 import use_cases.CreateBatch
 import use_cases.CreateProduct
 import use_cases.CreateRecipe
@@ -25,18 +22,26 @@ val zoneId = ZoneId.systemDefault()
 fun main() {
     displayWelcomeMessage()
 
-    val command = input.nextInt()
-    input.nextLine()
-    runCommand(command)
+    var command: Int?
+    do {
+        displayMenu()
+        command = input.nextInt()
+        input.nextLine()
+        runCommand(command)
+    } while (command != 0)
 }
 
 fun displayWelcomeMessage() {
     println("Welcome to SoapNotes (${version}")
+}
+
+fun displayMenu() {
     println("+---+---------------+")
     println("| 1 | Add batch     |")
     println("| 2 | Add product   |")
     println("| 3 | View batches  |")
     println("| 4 | View recipes  |")
+    println("| 0 | Exit          |")
     println("+---+---------------+")
     println("")
 }
@@ -53,6 +58,7 @@ fun runCommand(c: Int) {
 
 fun addBatch() {
     // Get raw input for batch row
+    println("----------------")
     println("Add batch")
     println("----------------")
     print("Name: ")
@@ -66,13 +72,20 @@ fun addBatch() {
 
     // Get raw input for product
     val productsRaw = arrayListOf<String>()
+    println("----------------")
     println("Products used")
-    println("-------------")
+    println("----------------")
     do {
-        print("Product [g-product_id]: ")
+        print("Product ((g)-(product_id)): ")
         val productRaw = input.nextLine()
         if (productRaw != "") productsRaw.add(productRaw)
     } while (productRaw != "")
+    println("productsRaw $productsRaw.toString()")
+
+    // Process the raw product input into an array of Ingredients
+    val recipe = Recipe()
+    productsRaw.forEach { recipe.addIngredient(productRawToIngredient(it)) }
+    CreateRecipe(recipe, SQLiteRecipeRepo(s)).run()
 
     // Use raw input or default
     val name = if (nameRaw == "") "Unnamed batch" else nameRaw
@@ -83,16 +96,24 @@ fun addBatch() {
         if (cureDateRaw == "") LocalDate.now().plusWeeks(6).atStartOfDay(zoneId).toEpochSecond()
         else LocalDate.parse(cureDateRaw).atStartOfDay(zoneId).toEpochSecond()
 
-    // Create recipe for batch
-
-
     // Invoke use case
     val returnCode = CreateBatch(
-        Batch(name = name, pourDate = pourDate, cureDate = cureDate),
+        Batch(name = name, pourDate = pourDate, cureDate = cureDate, recipe = recipe),
         SQLiteBatchRepo(s, recipeRepo = SQLiteRecipeRepo(s))
     ).run()
 
     println("Returned $returnCode")
+}
+
+fun productRawToIngredient(p: String): Ingredient {
+    val tokens = p.split('-')
+
+    val product = SQLiteProductRepo(s).findById(tokens[1].toInt())
+
+    return Ingredient(
+        product = product,
+        measurementAmount = tokens[0].toFloat()
+    )
 }
 
 fun addProduct() {
