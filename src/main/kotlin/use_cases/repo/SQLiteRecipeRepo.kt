@@ -1,6 +1,7 @@
 package use_cases.repo
 
 import entities.Recipe
+import org.sqlite.SQLiteException
 import ports.RecipeRepo
 import java.sql.ResultSet
 import java.sql.SQLException
@@ -13,13 +14,19 @@ class SQLiteRecipeRepo(val s: Statement) : RecipeRepo {
         return recipeReturn
     }
 
-    override fun findById(id: Int): Recipe {
+    override fun findById(id: Int): Recipe? {
         val result = query("SELECT * FROM recipes WHERE id = ${id}")
 
+        val recipeId = try { result.getInt("id") } catch (e: SQLiteException) { null }
+        val recipeName = try { result.getString("name") } catch (e: SQLiteException) { null }
+        val recipeVersion = try { result.getString("version") } catch (e: SQLiteException) { null }
+
+        if (recipeId == null || recipeName == null || recipeVersion == null) return null
+
         return Recipe(
-            id = result.getInt("id"),
-            name = result.getString("name"),
-            version = result.getString("version")
+            id = recipeId,
+            name = recipeName,
+            version = recipeVersion,
         )
     }
 

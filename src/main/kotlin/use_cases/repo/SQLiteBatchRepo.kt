@@ -18,13 +18,18 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
         val listOfBatches = ArrayList<Batch>()
 
         while (result.next()) {
+            val batchId = result.getInt("id")
+            val batchName = result.getString("name")
+            val pourDate = result.getLong("pour_date")
+            val cureDate = result.getLong("cure_date")
             val recipe = recipeRepo.findById(result.getInt("recipe_id"))
+
             listOfBatches.add(
                 Batch(
-                    id = result.getInt("id"),
-                    name = result.getString("name"),
-                    pourDate = result.getLong("pour_date"),
-                    cureDate = result.getLong("cure_date"),
+                    id = batchId,
+                    name = batchName,
+                    pourDate = pourDate,
+                    cureDate = cureDate,
                     recipe = recipe
                 )
             )

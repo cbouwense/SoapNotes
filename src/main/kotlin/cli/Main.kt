@@ -1,14 +1,13 @@
 package cli
 
 import entities.*
+import use_cases.*
 import use_cases.repo.SQLiteRecipeRepo
-import use_cases.CreateBatch
-import use_cases.CreateProduct
-import use_cases.CreateRecipe
-import use_cases.GetAllProducts
 import use_cases.repo.SQLiteBatchRepo
 import use_cases.repo.SQLiteProductRepo
+import java.sql.Connection
 import java.sql.DriverManager
+import java.sql.Statement
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -17,7 +16,6 @@ import java.util.*
 val version = "v0.0.1"
 val input = Scanner(System.`in`)
 val c = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\bouwe\\code\\SoapNotes\\resources\\soapnotes.db")
-val s = c.createStatement()
 val zoneId = ZoneId.systemDefault()
 
 fun main() {
@@ -49,16 +47,30 @@ fun displayMenu() {
 
 fun runCommand(c: Int) {
     when (c) {
+        0 -> /* no-op */ {}
         1 -> addBatch()
         2 -> addProduct()
-        3 -> println("Not implemented yet")
+        3 -> listBatches()
         4 -> listProducts()
         else -> println("Unknown command")
     }
 }
 
+fun listBatches() {
+    val batchStatement = c.createStatement()
+    val recipeStatement = c.createStatement()
+    val batches = GetAllBatches(SQLiteBatchRepo(batchStatement, SQLiteRecipeRepo(recipeStatement))).run()
+    println("----------------")
+    println("Batches")
+    println("----------------")
+    batches.forEach{ println("| ${it.id}\t| ${it.name}\t| ${it.pourDate}\t| ${it.cureDate} | ${it.recipe?.id}") }
+    println("----------------")
+    println("")
+}
+
 fun listProducts() {
-    val products = GetAllProducts(SQLiteProductRepo(s)).run()
+    val productStatement = c.createStatement()
+    val products = GetAllProducts(SQLiteProductRepo(productStatement)).run()
     println("----------------")
     println("Products")
     println("----------------")
@@ -81,23 +93,33 @@ fun addBatch() {
     print("[6 weeks from today]: ")
     val cureDateRaw = input.nextLine()
 
-    // Get raw input for product
-    val productsRaw = arrayListOf<String>()
+    // Process the raw product input into an array of Ingredients
+    val recipe = Recipe()
     println("----------------")
     println("Products used")
     println("----------------")
     do {
         listProducts()
-        print("Product ((g)-(product_id)): ")
-        val productRaw = input.nextLine()
-        if (productRaw != "") productsRaw.add(productRaw)
-    } while (productRaw != "")
-    println("productsRaw $productsRaw.toString()")
 
-    // Process the raw product input into an array of Ingredients
-    val recipe = Recipe()
-    productsRaw.forEach { recipe.addIngredient(productRawToIngredient(it)) }
-    CreateRecipe(recipe, SQLiteRecipeRepo(s)).run()
+        print("Product ID: ")
+        val productIdRaw = input.nextInt()
+        if (productIdRaw == 0) break
+        print("Product Used (g): ")
+        val productWeightRaw = input.nextFloat()
+
+        recipe.addIngredient(
+            Ingredient(
+                Product(
+                    id = productIdRaw,
+                    netWeightAmount = productWeightRaw
+                )
+            )
+        )
+    } while (productIdRaw != 0)
+
+    val recipeStatement = c.createStatement()
+    val batchStatement = c.createStatement()
+    CreateRecipe(recipe, SQLiteRecipeRepo(recipeStatement)).run()
 
     // Use raw input or default
     val name = if (nameRaw == "") "Unnamed batch" else nameRaw
@@ -111,21 +133,10 @@ fun addBatch() {
     // Invoke use case
     val returnCode = CreateBatch(
         Batch(name = name, pourDate = pourDate, cureDate = cureDate, recipe = recipe),
-        SQLiteBatchRepo(s, recipeRepo = SQLiteRecipeRepo(s))
+        SQLiteBatchRepo(batchStatement, recipeRepo = SQLiteRecipeRepo(recipeStatement))
     ).run()
 
     println("Returned $returnCode")
-}
-
-fun productRawToIngredient(p: String): Ingredient {
-    val tokens = p.split('-')
-
-    val product = SQLiteProductRepo(s).findById(tokens[1].toInt())
-
-    return Ingredient(
-        product = product,
-        measurementAmount = tokens[0].toFloat()
-    )
 }
 
 fun addProduct() {
@@ -138,13 +149,14 @@ fun addProduct() {
     print("Price (c): ")
     val cents = input.nextInt()
 
+    val productStatement = c.createStatement()
     val returnCode = CreateProduct(
         Product(
             name = name,
             netWeightAmount = grams,
             priceInCents = cents
         ),
-        SQLiteProductRepo(s)
+        SQLiteProductRepo(productStatement)
     ).run()
 
     println("Returned $returnCode")
