@@ -20,7 +20,8 @@ class SQLiteBatchRepo(override val s: Statement, val recipeRepo: RecipeRepo) : S
 
         while (result.next()) {
             val batch = translateResultSetToEntity(result)
-            if (batch == null) break
+            if (batch == null) continue
+
             listOfBatches.add(batch)
         }
 
@@ -49,19 +50,20 @@ class SQLiteBatchRepo(override val s: Statement, val recipeRepo: RecipeRepo) : S
     }
 
     fun translateResultSetToEntity(r: ResultSet): Batch? {
-        val batchId = r.getInt("id")
-        val batchName = r.getString("name")
-        val pourDate = r.getLong("pour_date")
-        val cureDate = r.getLong("cure_date")
-        val recipe = recipeRepo.findById(r.getInt("recipe_id"))
+        val batchId = try { r.getInt("id") } catch (e: SQLException) { null }
+        val batchPourDate = try { r.getInt("pour_date").toLong() } catch (e: SQLException) { null }
+        val batchCureDate = try { r.getInt("cure_date").toLong() } catch (e: SQLException) { null }
+        val batchName = try { r.getString("name") } catch (e: SQLException) { null }
+        val batchRecipeId = try { r.getInt("recipe_id") } catch (e: SQLException) { null }
+        val recipe = if (batchRecipeId != null) { recipeRepo.findById(batchRecipeId) } else null
 
-        if (batchId == null || batchName == null || pourDate == null || cureDate == null || recipe == null) return null
+        if (batchId == null || batchName == null || batchPourDate == null || batchCureDate == null) return null
 
         return Batch(
             id = batchId,
             name = batchName,
-            pourDate = pourDate,
-            cureDate = cureDate,
+            pourDate = batchPourDate,
+            cureDate = batchCureDate,
             recipe = recipe
         )
     }

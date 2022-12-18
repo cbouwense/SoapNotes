@@ -33,7 +33,8 @@ class SQLiteRecipeRepo(override val s: Statement) : SQLiteRepo(s), RecipeRepo {
 
         while (result.next()) {
             val recipe = translateResultSetToEntity(result)
-            if (recipe == null) break
+            if (recipe == null) continue
+
             listOfRecipes.add(recipe)
         }
 

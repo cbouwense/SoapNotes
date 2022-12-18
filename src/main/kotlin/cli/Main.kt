@@ -15,23 +15,6 @@ val input = Scanner(System.`in`)
 val c = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\bouwe\\code\\SoapNotes\\resources\\soapnotes.db")
 val zoneId = ZoneId.systemDefault()
 
-fun Test() {
-    val s = c.createStatement()
-    val recipeRepo = SQLiteRecipeRepo(s)
-    val batchRepo = SQLiteBatchRepo(s, recipeRepo)
-    val productRepo = SQLiteProductRepo(s)
-    val recipe = recipeRepo.findById(1)
-    val batch = Batch(
-        name = "Test batch",
-        pourDate = LocalDate.now().atStartOfDay(zoneId).toEpochSecond(),
-        cureDate = LocalDate.now().plusDays(30).atStartOfDay(zoneId).toEpochSecond(),
-        recipe = recipe
-    )
-    val createBatch = CreateBatch(batch, batchRepo)
-    val batchId = createBatch.run()
-    println("Created batch with id: ${batchId}")
-}
-
 fun main() {
     displayWelcomeMessage()
 

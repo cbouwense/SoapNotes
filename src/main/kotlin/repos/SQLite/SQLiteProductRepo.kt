@@ -18,7 +18,8 @@ class SQLiteProductRepo(override val s: Statement) : SQLiteRepo(s), ProductRepo 
 
         while (result.next()) {
             val product = translateResultSetToEntity(result)
-            if (product == null) break
+            if (product == null) continue
+
             listOfProducts.add(product)
         }
 
