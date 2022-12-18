@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.*
 import ports.RecipeRepo
+import repos.SQLite.SQLiteBatchRepo
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement

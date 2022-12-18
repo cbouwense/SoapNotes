@@ -2,9 +2,9 @@ package cli
 
 import entities.*
 import use_cases.*
-import repos.SQLiteRecipeRepo
-import repos.SQLiteBatchRepo
-import repos.SQLiteProductRepo
+import repos.SQLite.SQLiteRecipeRepo
+import repos.SQLite.SQLiteBatchRepo
+import repos.SQLite.SQLiteProductRepo
 import java.sql.DriverManager
 import java.time.LocalDate
 import java.time.ZoneId

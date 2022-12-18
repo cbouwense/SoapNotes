@@ -1,4 +1,4 @@
-package repos
+package repos.SQLite
 
 import entities.Batch
 import ports.BatchRepo
@@ -7,7 +7,7 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
 
-class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo {
+class SQLiteBatchRepo(override val s: Statement, val recipeRepo: RecipeRepo) : SQLiteRepo(s), BatchRepo {
     override fun create(b: Batch): Int {
         return update("INSERT INTO batches VALUES (NULL, ${b.pourDate}, ${b.cureDate}, '${b.name}', ${b.recipe?.id})")
     }
@@ -15,6 +15,8 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
     override fun getAll(): List<Batch> {
         val result = query("SELECT * FROM batches")
         val listOfBatches = ArrayList<Batch>()
+
+        if (result == null) return listOfBatches.toList()
 
         while (result.next()) {
             val batch = translateResultSetToEntity(result)
@@ -27,16 +29,22 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
 
     override fun findById(id: Int): Batch? {
         val result = query("SELECT * FROM batches WHERE id = ${id}")
+        if (result == null) return null
+
         return translateResultSetToEntity(result)
     }
 
     override fun findByName(name: String): Batch? {
         val result = query("SELECT * FROM batches WHERE name = ${name}")
+        if (result == null) return null
+
         return translateResultSetToEntity(result)
     }
 
     override fun findByPourDate(pourDate: Int): Batch? {
         val result = query("SELECT * FROM batches WHERE pour_date = ${pourDate}")
+        if (result == null) return null
+
         return translateResultSetToEntity(result)
     }
 
@@ -57,19 +65,4 @@ class SQLiteBatchRepo(val s: Statement, val recipeRepo: RecipeRepo) : BatchRepo 
             recipe = recipe
         )
     }
-
-    // TODO: this should probably be in a parent class.
-    private fun update(sql: String): Int {
-        try {
-            return s.executeUpdate(sql)
-        } catch (e: SQLException) {
-            println(e.toString())
-            return -1
-        }
-    }
-
-    // TODO: this should probably be in a parent class.
-    private fun query(sql: String): ResultSet {
-            return s.executeQuery(sql)
-        }
 }

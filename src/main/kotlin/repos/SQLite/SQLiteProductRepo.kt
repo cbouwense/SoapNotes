@@ -1,4 +1,4 @@
-package repos
+package repos.SQLite
 
 import entities.Product
 import ports.ProductRepo
@@ -6,15 +6,15 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
 
-class SQLiteProductRepo(val s: Statement) : ProductRepo {
+class SQLiteProductRepo(override val s: Statement) : SQLiteRepo(s), ProductRepo {
     override fun create(p: Product): Int {
         return update("INSERT INTO products VALUES (NULL, '${p.name}', ${p.netWeightAmount}, ${p.priceInCents})")
     }
 
     override fun getAll(): List<Product> {
         val result = query("SELECT * FROM products")
-
         val listOfProducts = ArrayList<Product>()
+        if (result == null) return listOfProducts.toList()
 
         while (result.next()) {
             val product = translateResultSetToEntity(result)
@@ -27,11 +27,15 @@ class SQLiteProductRepo(val s: Statement) : ProductRepo {
 
     override fun findById(id: Int): Product? {
         val result = query("SELECT * FROM products WHERE id = ${id}")
+        if (result == null) return null
+
         return translateResultSetToEntity(result)
     }
 
     override fun findByName(name: String): Product? {
         val result = query("SELECT * FROM products WHERE name = ${name}")
+        if (result == null) return null
+
         return translateResultSetToEntity(result)
     }
 
@@ -49,20 +53,5 @@ class SQLiteProductRepo(val s: Statement) : ProductRepo {
             netWeightAmount = totalGrams,
             priceInCents = totalCents
         )
-    }
-
-    // TODO: this should probably be in a parent class.
-    private fun update(sql: String): Int {
-        try {
-            return s.executeUpdate(sql)
-        } catch (e: SQLException) {
-            println(e.toString())
-            return -1
-        }
-    }
-
-    // TODO: this should probably be in a parent class.
-    private fun query(sql: String): ResultSet {
-        return s.executeQuery(sql)
     }
 }

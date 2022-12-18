@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.anyString
 import org.mockito.Mockito.times
+import repos.SQLite.SQLiteRecipeRepo
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
