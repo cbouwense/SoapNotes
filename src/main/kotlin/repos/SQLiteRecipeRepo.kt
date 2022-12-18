@@ -1,6 +1,5 @@
-package use_cases.repo
+package repos
 
-import entities.Batch
 import entities.Recipe
 import org.sqlite.SQLiteException
 import ports.RecipeRepo

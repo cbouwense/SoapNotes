@@ -1,7 +1,6 @@
-package use_cases.repo
+package repos
 
 import entities.Batch
-import entities.Product
 import ports.BatchRepo
 import ports.RecipeRepo
 import java.sql.ResultSet

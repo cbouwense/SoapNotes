@@ -1,4 +1,4 @@
-package repo
+package repos
 
 import entities.Batch
 import org.assertj.core.api.Assertions.assertThat
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.*
 import ports.RecipeRepo
-import use_cases.repo.SQLiteBatchRepo
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement

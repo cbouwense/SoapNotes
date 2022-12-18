@@ -1,4 +1,4 @@
-package use_cases.repo
+package repos
 
 import entities.Product
 import ports.ProductRepo
